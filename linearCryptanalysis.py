@@ -11,12 +11,14 @@
 
 import sys
 
+# check input files
 if len(sys.argv) != 3:
     print("number of argument not matches, run the program with two files (plaintexts and ciphertexts)")
     exit()
 
 plaintexts, ciphertexts =  open(sys.argv[1], 'r'), open(sys.argv[2], 'r')
 
+# print input
 def printIn():
         i = 1
         pt, ct = plaintexts.readline(), ciphertexts.readline()
