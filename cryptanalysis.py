@@ -1,5 +1,5 @@
-#####           Linear Cryptanalysis for a              #####
-#####   Simple Substitution-Permutation Network Cipher  #####
+#####   Cryptanalysis for a Simple Substitution-Permutation     #####
+#####                    Network Cipher                         #####
 
 ## Cipher Reference:  
 ##  http://www.engr.mun.ca/~howard/Research/Papers/ldc_tutorial.html
@@ -18,7 +18,7 @@ import numpy as np
 
 # check input files
 if len(sys.argv) != 3:
-    print("number of argument not matches, run the program with two files (plaintexts and ciphertexts)")
+    print("number of argument not matches, please run the program with two files (plaintexts and ciphertexts)")
     exit()
 
 
