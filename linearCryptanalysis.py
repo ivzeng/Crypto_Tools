@@ -66,3 +66,4 @@ print(bin(subOnce(0b0000000100100011, sBox, sBoxCount, 1)))
 
 # for i in range(pow(2,5)):
 #    print(bin(blockPairs[-1][-1] & i))
+print("afan")
