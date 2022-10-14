@@ -13,7 +13,7 @@
 ## "./linearCryptanalysis.py (plaintextsFile) (ciphertextsFile)" 
 
 import sys
-from turtle import back
+import numpy as np
 
 # check input files
 if len(sys.argv) != 3:
@@ -41,7 +41,7 @@ def addReverse(forward: list) -> list:
 
 # undo the substitution once 
 #   dir =   0 - forward    1 - backward
-def subOnce(txt: int, dir: int):
+def subOnce(txt: int, dir: int = 0):
     res = 0
     for order in range(sBoxCount):
         res += (sBox[dir][txt%power])*(power**order)
@@ -85,6 +85,19 @@ def setKey(parts:list):
 def setSelectedIndexes(idx: list):
     return sum(pow(2,blockSize-i) for i in idx)
 
+# generates a linear approximation table for the s-box
+def linearApproxTable(sBox) -> list:
+    rng = len(sBox[0])
+    lATable = [[0 for i in range(rng)] for j in range(rng)]
+    for i in range(rng):
+        for j in range(rng):
+            for val in range(rng):
+                lATable[i][j] += findLinearRelation(val&i, subOnce(val)&j)
+    for r in lATable:
+        for i in range(rng):
+            r[i] -= rng//2
+    return lATable
+
 # solve
 sBoxSize = 4    # number of bit of the input for a s-box
 sBoxCount = 4   # number of sub-block in each block of text
@@ -97,11 +110,16 @@ inIdx = setSelectedIndexes([5,7,8])
 outIdx = setSelectedIndexes([6,8,14,16])
 key1 = setKey([[7,2],[6,4]])
 
+#print('linear approximation table:')
+#print(np.array(linearApproxTable(sBox)))
+
 print('input sum:', bin(inIdx))
 print('output sum:', bin(outIdx))
 print('guessed key:', bin(key1))
-print(linearRelationCount(blockPairs, inIdx, outIdx, key1))
+occ = linearRelationCount(blockPairs, inIdx, outIdx, key1)
+print('occurences:', occ)
+print('bias:', getBias(occ))
 
 # for i in range(pow(2,5)):
 #    print(bin(blockPairs[-1][-1] & i))
-print("afan")
+# print("afan")
