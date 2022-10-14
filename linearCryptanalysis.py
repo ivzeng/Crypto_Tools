@@ -15,6 +15,7 @@
 import sys
 import numpy as np
 
+
 # check input files
 if len(sys.argv) != 3:
     print("number of argument not matches, run the program with two files (plaintexts and ciphertexts)")
@@ -98,6 +99,20 @@ def linearApproxTable(sBox) -> list:
             r[i] -= rng//2
     return lATable
 
+# computes the bias of all possible key based on the selected blocks,
+#   returns the each key and the absolute bias, sorted with the 
+#   absolute value of the bias.
+def possibleKeys(pairs: list, inBits: int, outBits: int, keyBlocks: list):
+    def getKeys(res, cur, p):
+        if p == len(keyBlocks):
+            res += [cur]
+            return
+        for i in range(power):
+            getKeys(res, cur+i**(sBoxCount-keyBlocks[p]), p+1)
+    res = []
+    getKeys(res, 0, 0)
+    return res
+
 # solve
 sBoxSize = 4    # number of bit of the input for a s-box
 sBoxCount = 4   # number of sub-block in each block of text
@@ -110,16 +125,19 @@ inIdx = setSelectedIndexes([5,7,8])
 outIdx = setSelectedIndexes([6,8,14,16])
 key1 = setKey([[7,2],[6,4]])
 
-#print('linear approximation table:')
-#print(np.array(linearApproxTable(sBox)))
+# linear approximation of s-box
+# print('linear approximation table:')
+# print(np.array(linearApproxTable(sBox)))
 
+# occurence of a linear relation and bias
 print('input sum:', bin(inIdx))
 print('output sum:', bin(outIdx))
 print('guessed key:', bin(key1))
 occ = linearRelationCount(blockPairs, inIdx, outIdx, key1)
-print('occurences:', occ)
+# print('occurences:', occ)
 print('bias:', getBias(occ))
 
-# for i in range(pow(2,5)):
-#    print(bin(blockPairs[-1][-1] & i))
-# print("afan")
+# absolute bias of each specified key
+print([bin(i) for i in  possibleKeys(blockPairs, inIdx, outIdx, [2,4])])
+
+
