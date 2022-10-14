@@ -33,7 +33,7 @@ def readIn() -> list:
 
 # creates a list indicating the both directions of a substitution box
 #   (or permutation)
-def addReverse(forward) -> list:
+def addReverse(forward: list) -> list:
     backward =  [-1 for i in range(len(forward))]
     for i in range(len(forward)):
         backward[forward[i]] = i
@@ -41,8 +41,7 @@ def addReverse(forward) -> list:
 
 # undo the substitution once 
 #   dir =   0 - forward    1 - backward
-def subOnce(txt, sBox, sBoxCount, dir):
-    power = len(sBox[0])
+def subOnce(txt: int, dir: int):
     res = 0
     for order in range(sBoxCount):
         res += (sBox[dir][txt%power])*(power**order)
@@ -51,18 +50,57 @@ def subOnce(txt, sBox, sBoxCount, dir):
 
 # return whether xors all bits of pi and ui gets 0 
 def findLinearRelation(pi, ui):
-    return 0
+    res = 1
+    while pi != 0:
+        res ^= pi%2
+        pi >>= 1
+    while ui != 0:
+        res ^= ui%2
+        ui >>= 1
+    return res
+
+# counts the number of occurences when the xor result of the 
+#   selected bits (1-bit of inBits) of inputs (plaintext)
+#   equals to the selected bits (1-bits of outBits) of 
+#   outputs (state before the final round of substitution).
+def linearRelationCount(pairs: list, inBits: int, outBits: int, finalKey: int) -> int:
+    res = 0
+    for pair in pairs:
+        res += findLinearRelation(pair[0]&inBits, subOnce(pair[1]^finalKey, 1)&outBits)
+    return res
+
+# get the absolute value of bias
+def getBias(c):
+    return abs((c-n/2)/n)
+
+# sets the key, where parts is a list of [sk, i], indicating
+#   the value of subkey at i-th sub-block (0-indexed)
+def setKey(parts:list):
+    k = 0
+    for p in parts:
+        k += p[0]*pow(power, sBoxCount-p[1])
+    return k
+
+# sets the indexes selected and stores them as a binary number
+def setSelectedIndexes(idx: list):
+    return sum(pow(2,blockSize-i) for i in idx)
 
 # solve
 sBoxSize = 4    # number of bit of the input for a s-box
 sBoxCount = 4   # number of sub-block in each block of text
+blockSize = sBoxSize*sBoxCount
 blockPairs = readIn()
 n = len(blockPairs)
 sBox = addReverse([14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7])
+power = len(sBox[0])
+inIdx = setSelectedIndexes([5,7,8])
+outIdx = setSelectedIndexes([6,8,14,16])
+key1 = setKey([[7,2],[6,4]])
 
-#print(blockPairs)
-print(sBox)
-print(bin(subOnce(0b0000000100100011, sBox, sBoxCount, 1)))
+print('input sum:', bin(inIdx))
+print('output sum:', bin(outIdx))
+print('guessed key:', bin(key1))
+print(linearRelationCount(blockPairs, inIdx, outIdx, key1))
 
 # for i in range(pow(2,5)):
 #    print(bin(blockPairs[-1][-1] & i))
