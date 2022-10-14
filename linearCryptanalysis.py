@@ -82,8 +82,8 @@ def setKey(parts:list):
         k += p[0]*pow(power, sBoxCount-p[1])
     return k
 
-# sets the indexes selected and stores them as a binary number
-def setSelectedIndexes(idx: list):
+# sets the indices selected and stores them as a binary number
+def setSelectedindices(idx: list):
     return sum(pow(2,blockSize-i) for i in idx)
 
 # generates a linear approximation table for the s-box
@@ -108,36 +108,46 @@ def possibleKeys(pairs: list, inBits: int, outBits: int, keyBlocks: list):
             res += [cur]
             return
         for i in range(power):
-            getKeys(res, cur+i**(sBoxCount-keyBlocks[p]), p+1)
-    res = []
-    getKeys(res, 0, 0)
-    return res
+            getKeys(res, cur+i*power**(sBoxCount-keyBlocks[p]), p+1)
+    keys = []
+    getKeys(keys, 0, 0)
+    keyBiasMap = [[k, getBias(linearRelationCount(pairs, inBits, outBits, k))] for k in keys]
+    keyBiasMap.sort(key=lambda row: row[1], reverse=True)
+    return keyBiasMap
+
+# returns the string representation of a binary number
+def binToStr(bn, wid):
+    return bin(bn)[2:].zfill(wid)
 
 # solve
 sBoxSize = 4    # number of bit of the input for a s-box
 sBoxCount = 4   # number of sub-block in each block of text
 blockSize = sBoxSize*sBoxCount
+power = 2**sBoxSize
 blockPairs = readIn()
 n = len(blockPairs)
 sBox = addReverse([14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7])
-power = len(sBox[0])
-inIdx = setSelectedIndexes([5,7,8])
-outIdx = setSelectedIndexes([6,8,14,16])
-key1 = setKey([[7,2],[6,4]])
+sInIdx = [5,7,8]                        # selected input indices
+sOutIdx = [6,8,14,16]                   # selected output indices
+inIdx = setSelectedindices(sInIdx)
+outIdx = setSelectedindices(sOutIdx)
+key1 = setKey([[0b0111,2],[0b0110,4]])  # set k_6, k_7, k_8, k_14, k_15 to 1
 
 # linear approximation of s-box
 # print('linear approximation table:')
 # print(np.array(linearApproxTable(sBox)))
 
 # occurence of a linear relation and bias
-print('input sum:', bin(inIdx))
-print('output sum:', bin(outIdx))
-print('guessed key:', bin(key1))
+print('input indices chosen: ', binToStr(inIdx, blockSize))
+print('output indices chosen:', binToStr(outIdx, blockSize))
+print('guessed key:', binToStr(key1, blockSize))
 occ = linearRelationCount(blockPairs, inIdx, outIdx, key1)
 # print('occurences:', occ)
 print('bias:', getBias(occ))
 
-# absolute bias of each specified key
-print([bin(i) for i in  possibleKeys(blockPairs, inIdx, outIdx, [2,4])])
+# absolute bias of each specified key sorted in descending order
+keyBlocks = [2,4]
+keyBiasMap = possibleKeys(blockPairs, inIdx, outIdx, keyBlocks)
+print(power, 'most possible key choices:\n',' '.join(('key: '+ binToStr(k[0], blockSize) + ' bias: ' + str(k[1])) +'\n' for k in keyBiasMap[:power]))
 
 
