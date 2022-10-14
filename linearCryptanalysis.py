@@ -16,15 +16,15 @@ if len(sys.argv) != 3:
     print("number of argument not matches, run the program with two files (plaintexts and ciphertexts)")
     exit()
 
-plaintexts, ciphertexts =  open(sys.argv[1], 'r'), open(sys.argv[2], 'r')
 
-# print input
-def printIn():
-        i = 1
-        pt, ct = plaintexts.readline(), ciphertexts.readline()
-        while pt:
-            print('plaintext', i, ':', pt, " ", 'ciphertext', i, ':', ct)
-            pt, ct = plaintexts.readline(), ciphertexts.readline()
-            i += 1
+# reads input files and stored them in blockPairs
+def readIn():
+    blockPairs = []
+    plaintexts, ciphertexts =  open(sys.argv[1], 'r'), open(sys.argv[2], 'r')
+    nextline = plaintexts.readline()
+    while nextline:
+        blockPairs += [[int(nextline,2), int(ciphertexts.readline(),2)]]
+        nextline = plaintexts.readline()
+    return blockPairs
 
-printIn()
+print(readIn())
