@@ -1,11 +1,12 @@
 #####           Linear Cryptanalysis for a              #####
 #####   Simple Substitution-Permutation Network Cipher  #####
 
-## Cipher Reference:  http://www.engr.mun.ca/~howard/Research/Papers/ldc_tutorial.html
+## Cipher Reference:  
+##  http://www.engr.mun.ca/~howard/Research/Papers/ldc_tutorial.html
 
 ## The program produces the a linear cryptanalysis based on the 
-##  given a collection of distinct pairs of one plaintext and one
-##  ciphertext. The plaintexts and ciphertext need to be stored
+##  given a collection of distinct pairs of plaintexts and
+##  ciphertexts. The plaintexts and ciphertext need to be stored
 ##  in two files, respectively. One text for each line.
 
 ## Enter command like the following to run the program:
@@ -48,13 +49,15 @@ def subOnce(txt, sBox, sBoxCount, dir):
         txt //= power
     return res
 
-
-
+# return whether xors all bits of pi and ui gets 0 
+def findLinearRelation(pi, ui):
+    return 0
 
 # solve
 sBoxSize = 4    # number of bit of the input for a s-box
 sBoxCount = 4   # number of sub-block in each block of text
 blockPairs = readIn()
+n = len(blockPairs)
 sBox = addReverse([14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7])
 
 #print(blockPairs)
