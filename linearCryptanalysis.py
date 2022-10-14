@@ -102,7 +102,7 @@ def linearApproxTable(sBox) -> list:
 # computes the bias of all possible key based on the selected blocks,
 #   returns the each key and the absolute bias, sorted with the 
 #   absolute value of the bias.
-def possibleKeys(pairs: list, inBits: int, outBits: int, keyBlocks: list):
+def possibleKeys(pairs: list, inBits: int, outBits: int, keyBlocks: list, cur = 0):
     def getKeys(res, cur, p):
         if p == len(keyBlocks):
             res += [cur]
@@ -110,7 +110,7 @@ def possibleKeys(pairs: list, inBits: int, outBits: int, keyBlocks: list):
         for i in range(power):
             getKeys(res, cur+i*power**(sBoxCount-keyBlocks[p]), p+1)
     keys = []
-    getKeys(keys, 0, 0)
+    getKeys(keys, cur, 0)
     keyBiasMap = [[k, getBias(linearRelationCount(pairs, inBits, outBits, k))] for k in keys]
     keyBiasMap.sort(key=lambda row: row[1], reverse=True)
     return keyBiasMap
@@ -129,25 +129,40 @@ n = len(blockPairs)
 sBox = addReverse([14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7])
 sInIdx = [5,7,8]                        # selected input indices
 sOutIdx = [6,8,14,16]                   # selected output indices
-inIdx = setSelectedindices(sInIdx)
-outIdx = setSelectedindices(sOutIdx)
+
+inIdx1 = setSelectedindices(sInIdx)
+outIdx1 = setSelectedindices(sOutIdx)
 key1 = setKey([[0b0111,2],[0b0110,4]])  # set k_6, k_7, k_8, k_14, k_15 to 1
 
-# linear approximation of s-box
+## linear approximation of s-box
 # print('linear approximation table:')
 # print(np.array(linearApproxTable(sBox)))
 
-# occurence of a linear relation and bias
-print('input indices chosen: ', binToStr(inIdx, blockSize))
-print('output indices chosen:', binToStr(outIdx, blockSize))
+## computes occurence of a linear relation and bias under a key guess
+print('input indices chosen: ', binToStr(inIdx1, blockSize))
+print('output indices chosen:', binToStr(outIdx1, blockSize))
 print('guessed key:', binToStr(key1, blockSize))
-occ = linearRelationCount(blockPairs, inIdx, outIdx, key1)
+occ = linearRelationCount(blockPairs, inIdx1, outIdx1, key1)
 # print('occurences:', occ)
 print('bias:', getBias(occ))
 
-# absolute bias of each specified key sorted in descending order
-keyBlocks = [2,4]
-keyBiasMap = possibleKeys(blockPairs, inIdx, outIdx, keyBlocks)
+## check absolute bias under each possible final subkey specified,
+##   get the value of the second and fourth blocks of the key
+##   (the one with largest bias) 
+keyBlocks1 = [2,4]
+keyBiasMap = possibleKeys(blockPairs, inIdx1, outIdx1, keyBlocks1)
 print(power, 'most possible key choices:\n',' '.join(('key: '+ binToStr(k[0], blockSize) + ' bias: ' + str(k[1])) +'\n' for k in keyBiasMap[:power]))
+partialKey = keyBiasMap[0][0]
+
+## get the value of remainning parts of the final subkey
+keyBlocks2 = [1,3]
+sInIdx = [1,4,9,12]                        # selected input indices
+sOutIdx = [2,6,10,14]                   # selected output indices
+inIdx2 = setSelectedindices(sInIdx)
+outIdx2 = setSelectedindices(sOutIdx)
+keyBiasMap = possibleKeys(blockPairs, inIdx2, outIdx2, keyBlocks2, partialKey)
+finalKey = keyBiasMap[0][0]
+print(power, 'most possible key choices:\n',' '.join(('key: '+ binToStr(k[0], blockSize) + ' bias: ' + str(k[1])) +'\n' for k in keyBiasMap[:power]))
+print('final key:', binToStr(finalKey, blockSize))
 
 
