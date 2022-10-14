@@ -12,6 +12,7 @@
 ## Enter command like the following to run the program:
 ## "./linearCryptanalysis.py (plaintextsFile) (ciphertextsFile)" 
 
+from audioop import bias
 import sys
 import numpy as np
 
@@ -99,10 +100,15 @@ def linearApproxTable(sBox) -> list:
             r[i] -= rng//2
     return lATable
 
+# print the linear approximation table
+def printLinearApproxTable(sBox):
+    print('linear approximation table:')
+    print(np.array(linearApproxTable(sBox)))
+
 # computes the bias of all possible key based on the selected blocks,
 #   returns the each key and the absolute bias, sorted with the 
 #   absolute value of the bias.
-def possibleKeys(pairs: list, inBits: int, outBits: int, keyBlocks: list, cur = 0):
+def sortedKeyBiasMap(pairs: list, inBits: int, outBits: int, keyBlocks: list, cur = 0):
     def getKeys(res, cur, p):
         if p == len(keyBlocks):
             res += [cur]
@@ -119,50 +125,56 @@ def possibleKeys(pairs: list, inBits: int, outBits: int, keyBlocks: list, cur = 
 def binToStr(bn, wid):
     return bin(bn)[2:].zfill(wid)
 
-# solve
+# prints the bias base on the selected key
+def biasUnderKey(inIdx: list, outIdx: list, key:int = 0):
+    inIdx = setSelectedindices(inIdx)
+    outIdx = setSelectedindices(outIdx)
+    print('input indices chosen: ', binToStr(inIdx, blockSize))
+    print('output indices chosen:', binToStr(outIdx, blockSize))
+    print('guessed key:', binToStr(key, blockSize))
+    occ = linearRelationCount(blockPairs, inIdx, outIdx, key1)
+    print('occurences:', occ)
+    print('bias:', getBias(occ))
+    print()
+
+# linear cryptanalysis get part of the final key
+def linearCryptanalysis(inIdx: list, outIdx: list, keyBlocks: list,key:int = 0) -> int:
+    inIdx = setSelectedindices(inIdx)
+    outIdx = setSelectedindices(outIdx)
+    keyBiasMap = sortedKeyBiasMap(blockPairs, inIdx, outIdx, keyBlocks, key)
+    print(power, 'key choices that produces highest bias:\n',' \n '.join(('key: '+ binToStr(k[0], blockSize) + '              bias: ' + str(k[1])) for k in keyBiasMap[:power//2+1]))
+    return keyBiasMap[0]
+
+###         solve          ###
+blockPairs = readIn()
+n = len(blockPairs)
 sBoxSize = 4    # number of bit of the input for a s-box
 sBoxCount = 4   # number of sub-block in each block of text
 blockSize = sBoxSize*sBoxCount
 power = 2**sBoxSize
-blockPairs = readIn()
-n = len(blockPairs)
 sBox = addReverse([14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7])
-sInIdx = [5,7,8]                        # selected input indices
-sOutIdx = [6,8,14,16]                   # selected output indices
-
-inIdx1 = setSelectedindices(sInIdx)
-outIdx1 = setSelectedindices(sOutIdx)
+inIdx = [5,7,8]                        # selected input indices
+outIdx = [6,8,14,16]                   # selected output indices
 key1 = setKey([[0b0111,2],[0b0110,4]])  # set k_6, k_7, k_8, k_14, k_15 to 1
 
-## linear approximation of s-box
-# print('linear approximation table:')
-# print(np.array(linearApproxTable(sBox)))
+## computes occurences of a linear relation and bias under a key guess
+biasUnderKey(inIdx, outIdx, key1)
 
-## computes occurence of a linear relation and bias under a key guess
-print('input indices chosen: ', binToStr(inIdx1, blockSize))
-print('output indices chosen:', binToStr(outIdx1, blockSize))
-print('guessed key:', binToStr(key1, blockSize))
-occ = linearRelationCount(blockPairs, inIdx1, outIdx1, key1)
-# print('occurences:', occ)
-print('bias:', getBias(occ))
+## checks the absolute bias under each specified choices of subkey;
+##   returns the key value at the selected blocks
+##   (the one produces that largest bias)
+keyBlocks = [2,4]
+print("analysizing the bias under each choice at index", ', '.join(str(i*4-3) + '-' + str(i*4) for i in keyBlocks), 'of the final subkey...')
+partialKeyBias = linearCryptanalysis(inIdx, outIdx, keyBlocks)
+print("\npartial subkey:", binToStr(partialKeyBias[0], blockSize), '   bias:', partialKeyBias[1], '\n\n')
 
-## check absolute bias under each possible final subkey specified,
-##   get the value of the second and fourth blocks of the key
-##   (the one with largest bias) 
-keyBlocks1 = [2,4]
-keyBiasMap = possibleKeys(blockPairs, inIdx1, outIdx1, keyBlocks1)
-print(power, 'key choices that produces highest bias:\n',' '.join(('key: '+ binToStr(k[0], blockSize) + '           bias: ' + str(k[1])) +'\n' for k in keyBiasMap[:power]))
-partialKey = keyBiasMap[0][0]
 
 ## get the value of remainning parts of the final subkey
-keyBlocks2 = [1,3]
-sInIdx = [1,4,9,12]                        # selected input indices
-sOutIdx = [2,6,10,14]                   # selected output indices
-inIdx2 = setSelectedindices(sInIdx)
-outIdx2 = setSelectedindices(sOutIdx)
-keyBiasMap = possibleKeys(blockPairs, inIdx2, outIdx2, keyBlocks2, partialKey)
-finalKey = keyBiasMap[0][0]
-print(power, 'key choices that produces highest bias:\n',' '.join(('key: '+ binToStr(k[0], blockSize) + '        bias: ' + str(k[1])) +'\n' for k in keyBiasMap[:power])[:-1])
-print('final key:', binToStr(finalKey, blockSize))
+keyBlocks = [1,3]
+inIdx = [1,4,9,12]                      # selected input indices
+outIdx = [2,6,10,14]                    # selected output indices
+print('computing the remaining part of the final subkey...')
+finalKeyBias = linearCryptanalysis(inIdx, outIdx, keyBlocks, partialKeyBias[0])
+print("\nfinal subkey:", binToStr(finalKeyBias[0], blockSize), '     bias:', finalKeyBias[1], '\n\n')
 
 
