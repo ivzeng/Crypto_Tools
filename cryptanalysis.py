@@ -151,7 +151,7 @@ print('bias:', getBias(occ))
 ##   (the one with largest bias) 
 keyBlocks1 = [2,4]
 keyBiasMap = possibleKeys(blockPairs, inIdx1, outIdx1, keyBlocks1)
-print(power, 'most possible key choices:\n',' '.join(('key: '+ binToStr(k[0], blockSize) + ' bias: ' + str(k[1])) +'\n' for k in keyBiasMap[:power]))
+print(power, 'key choices that produces highest bias:\n',' '.join(('key: '+ binToStr(k[0], blockSize) + '           bias: ' + str(k[1])) +'\n' for k in keyBiasMap[:power]))
 partialKey = keyBiasMap[0][0]
 
 ## get the value of remainning parts of the final subkey
@@ -162,7 +162,7 @@ inIdx2 = setSelectedindices(sInIdx)
 outIdx2 = setSelectedindices(sOutIdx)
 keyBiasMap = possibleKeys(blockPairs, inIdx2, outIdx2, keyBlocks2, partialKey)
 finalKey = keyBiasMap[0][0]
-print(power, 'most possible key choices:\n',' '.join(('key: '+ binToStr(k[0], blockSize) + ' bias: ' + str(k[1])) +'\n' for k in keyBiasMap[:power]))
+print(power, 'key choices that produces highest bias:\n',' '.join(('key: '+ binToStr(k[0], blockSize) + '        bias: ' + str(k[1])) +'\n' for k in keyBiasMap[:power])[:-1])
 print('final key:', binToStr(finalKey, blockSize))
 
 
