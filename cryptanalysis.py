@@ -157,6 +157,9 @@ inIdx = [5,7,8]                        # selected input indices
 outIdx = [6,8,14,16]                   # selected output indices
 key1 = setKey([[0b0111,2],[0b0110,4]])  # set k_6, k_7, k_8, k_14, k_15 to 1
 
+## print the linear approximation table
+#   printLinearApproxTable(sBox)
+
 ## computes occurences of a linear relation and bias under a key guess
 biasUnderKey(inIdx, outIdx, key1)
 
