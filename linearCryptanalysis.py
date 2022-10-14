@@ -17,7 +17,7 @@ if len(sys.argv) != 3:
     exit()
 
 
-# reads input files and stored them in blockPairs
+# reads input files and stored them into a list of decimal numbers
 def readIn():
     blockPairs = []
     plaintexts, ciphertexts =  open(sys.argv[1], 'r'), open(sys.argv[2], 'r')
