@@ -117,7 +117,15 @@ def sortedKeyBiasMap(pairs: list, inBits: int, outBits: int, keyBlocks: list, cu
             getKeys(res, cur+i*power**(sBoxCount-keyBlocks[p]), p+1)
     keys = []
     getKeys(keys, cur, 0)
-    keyBiasMap = [[k, getBias(linearRelationCount(pairs, inBits, outBits, k))] for k in keys]
+    i = 1
+    kl = len(keys)
+    keyBiasMap = [0 for j in range(kl)]
+    progressBar(i)
+    for j in range(kl):
+        keyBiasMap[j] = [keys[j], getBias(linearRelationCount(pairs, inBits, outBits, keys[j]))]
+        if 100*j//kl > i:
+            i = 100*j//kl
+            progressBar(i)
     keyBiasMap.sort(key=lambda row: row[1], reverse=True)
     return keyBiasMap
 
@@ -144,6 +152,23 @@ def linearCryptanalysis(inIdx: list, outIdx: list, keyBlocks: list,key:int = 0) 
     keyBiasMap = sortedKeyBiasMap(blockPairs, inIdx, outIdx, keyBlocks, key)
     print(power, 'key choices that produces highest bias:\n',' \n '.join(('key: '+ binToStr(k[0], blockSize) + '              bias: ' + str(k[1])) for k in keyBiasMap[:power//2+1]))
     return keyBiasMap[0]
+
+
+# prints a progress bar for fun
+def progressBar(progress: int):
+    if progress >= 99:
+        print('\rdone!',' '*111 ,sep = '', flush=True)
+        return 
+    face = '^v^'
+    if progress >= 80:
+        face = '*~*'
+    elif progress >= 50:
+        face = 'ToT'
+    elif progress >= 30:
+        face = '-.-'
+    print("\r[", ' '*progress, face, ' '*(5+(100-progress)%2), '🔥','$$'*int((100-progress)//2),'] ', f"{progress:.0f}%", sep = '', end = '', flush=True)
+
+
 
 ###         solve          ###
 blockPairs = readIn()
