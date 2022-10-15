@@ -149,7 +149,7 @@ def linearCryptanalysis(inIdx: list, outIdx: list, keyBlocks: list,key:int = 0) 
     inIdx = setSelectedindices(inIdx)
     outIdx = setSelectedindices(outIdx)
     keyBiasMap = sortedKeyBiasMap(blockPairs, inIdx, outIdx, keyBlocks, key)
-    print(power//2+1, 'key choices that produces highest occurance:\n',' \n '.join(('key: '+ binToStr(k[0], blockSize) + '              bias: ' + str(k[1])) for k in keyBiasMap[:power//2+1]))
+    print(power//2+1, 'key choices that produces highest bias:\n',' \n '.join(('key: '+ binToStr(k[0], blockSize) + '              bias: ' + str(k[1])) for k in keyBiasMap[:power//2+1]))
     return keyBiasMap[0]
 
 
