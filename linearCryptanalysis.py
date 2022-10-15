@@ -1,18 +1,17 @@
-#####   Cryptanalysis for a Simple Substitution-Permutation     #####
-#####                    Network Cipher                         #####
+#####       Linear  Cryptanalysis for a Simple          ##### 
+#####     Substitution-Permutation Network Cipher       #####
 
 ## Cipher Reference:  
 ##  http://www.engr.mun.ca/~howard/Research/Papers/ldc_tutorial.html
 
-## The program produces the a linear cryptanalysis based on the 
-##  given a collection of distinct pairs of plaintexts and
-##  ciphertexts. The plaintexts and ciphertext need to be stored
-##  in two files, respectively. One text for each line.
+## The program produces the linear cryptanalysis on the final subkey
+##  based on the given collection of distinct plaintext-ciphertext
+##  pairs. The plaintexts and ciphertext need to be stored in two
+##  files, respectively. One text at each line.
 
 ## Enter command like the following to run the program:
 ## "./linearCryptanalysis.py (plaintextsFile) (ciphertextsFile)" 
 
-from audioop import bias
 import sys
 import numpy as np
 
@@ -41,7 +40,7 @@ def addReverse(forward: list) -> list:
         backward[forward[i]] = i
     return [forward, backward]
 
-# undo the substitution once 
+#  do or undo the substitution once 
 #   dir =   0 - forward    1 - backward
 def subOnce(txt: int, dir: int = 0):
     res = 0
@@ -150,7 +149,7 @@ def linearCryptanalysis(inIdx: list, outIdx: list, keyBlocks: list,key:int = 0) 
     inIdx = setSelectedindices(inIdx)
     outIdx = setSelectedindices(outIdx)
     keyBiasMap = sortedKeyBiasMap(blockPairs, inIdx, outIdx, keyBlocks, key)
-    print(power, 'key choices that produces highest bias:\n',' \n '.join(('key: '+ binToStr(k[0], blockSize) + '              bias: ' + str(k[1])) for k in keyBiasMap[:power//2+1]))
+    print(power//2+1, 'key choices that produces highest occurance:\n',' \n '.join(('key: '+ binToStr(k[0], blockSize) + '              bias: ' + str(k[1])) for k in keyBiasMap[:power//2+1]))
     return keyBiasMap[0]
 
 
