@@ -177,7 +177,7 @@ sBox = addReverse([14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7])
 ## generates all possible partial subkeys at block 1, 2, 4
 #   print(generateKeys([1,2,4]))
 
-## differential crytanalysis
+## differential cryptanalysis
 target = [6,7,14,15]
 keyParts = [2,4]
 partialKey = differentialCryptanalysis(textPairs, target, keyParts)
