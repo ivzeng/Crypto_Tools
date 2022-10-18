@@ -185,7 +185,7 @@ key1 = setKey([[0b0111,2],[0b0110,4]])  # set k_6, k_7, k_8, k_14, k_15 to 1
 ##printLinearApproxTable(sBox)
 
 ## computes occurences of a linear relation and bias under a key guess
-#biasUnderKey(inIdx, outIdx, key1)
+biasUnderKey(inIdx, outIdx, key1)
 
 ## checks the absolute bias under each specified choices of subkey;
 ##   returns the key value at the selected blocks
