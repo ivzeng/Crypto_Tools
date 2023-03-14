@@ -1,0 +1,7 @@
+To encrypte a file:
+    python fernet.py -e < [filename] > [ciphertext file name]
+    then input password twice
+
+To decryte a ciphertext:
+    python fernet.py -d < [ciphertext filename]
+    input password

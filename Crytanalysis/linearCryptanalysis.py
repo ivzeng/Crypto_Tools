@@ -9,8 +9,8 @@
 ##  pairs. The plaintexts and ciphertext need to be stored in two
 ##  files, respectively. One text at each line.
 
-## Enter command like the following to run the program:
-## "./linearCryptanalysis.py (plaintextsFile) (ciphertextsFile)" 
+## Enter the following command to run the program:
+## "Python linearCryptanalysis.py [plaintext-ciphertext pairs file]" 
 
 import sys
 import numpy as np

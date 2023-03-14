@@ -10,8 +10,8 @@
 ##  line containing the two plaintexts and their respected 
 ##  cipthertexts, separated by commas.
 
-## Enter command like the following to run the program:
-## "./DifferentialCryptanalysis.py (textsFile)" 
+## Enter the following command to run the program:
+## "Python differentialCryptanalysis.py [plaintexts file] [ciphertexts file]" 
 
 import sys
 import numpy as np
